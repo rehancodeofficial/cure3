@@ -68,38 +68,48 @@ router.get("/stats", ...authenticatePharmacy, async (req, res) => {
       });
     }
 
-    const [
-      totalPrescriptions,
-      pendingPrescriptions,
-      dispensedPrescriptions,
-      totalCustomers
-    ] = await Promise.all([
-      prisma.prescription.count({
-        where: { pharmacyId: pharmacyProfile.id }
-      }),
-      prisma.prescription.count({
-        where: {
-          pharmacyId: pharmacyProfile.id,
-          dispatchStatus: { in: ["SENT", "READY"] }
-        }
-      }),
-      prisma.prescription.count({
-        where: {
-          pharmacyId: pharmacyProfile.id,
-          dispatchStatus: "DISPENSED"
-        }
-      }),
-      prisma.patientProfile.count({
-        where: { selectedPharmacyId: pharmacyProfile.id }
-      })
-    ]);
+    // Debug logging to find which query is failing
+    console.log("DEBUG: Fetching pharmacy stats for profile:", pharmacyProfile.id);
 
-    res.json({
-      totalPrescriptions,
-      pendingPrescriptions,
-      dispensedPrescriptions,
-      totalCustomers
-    });
+    try {
+        const [
+          totalPrescriptions,
+          pendingPrescriptions,
+          dispensedPrescriptions,
+          totalCustomers
+        ] = await Promise.all([
+          prisma.prescription.count({
+            where: { pharmacyId: pharmacyProfile.id }
+          }),
+          prisma.prescription.count({
+            where: {
+              pharmacyId: pharmacyProfile.id,
+              dispatchStatus: { in: ["SENT", "READY"] }
+            }
+          }),
+          prisma.prescription.count({
+            where: {
+              pharmacyId: pharmacyProfile.id,
+              dispatchStatus: "DISPENSED"
+            }
+          }),
+          prisma.selectedPharmacy.count({
+            where: { pharmacyId: pharmacyProfile.id }
+          })
+        ]);
+
+        console.log("DEBUG: Pharmacy stats fetched successfully:", { totalPrescriptions, pendingPrescriptions, dispensedPrescriptions, totalCustomers });
+
+        res.json({
+          totalPrescriptions,
+          pendingPrescriptions,
+          dispensedPrescriptions,
+          totalCustomers
+        });
+    } catch (innerErr) {
+        console.error("DEBUG: Inner error in pharmacy stats queries:", innerErr);
+        throw innerErr; 
+    }
   } catch (err) {
     console.error("Failed to fetch pharmacy stats:", err);
     res.status(500).json({ error: "Failed to fetch stats" });
@@ -127,7 +137,7 @@ router.get("/profile", ...authenticatePharmacy, async (req, res) => {
 
     const user = await prisma.user.findUnique({
       where: { id: String(userId) },
-      select: { id: true, role: true, email: true, name: true },
+      select: { id: true, role: true, email: true, firstName: true, lastName: true },
     });
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -183,6 +193,8 @@ router.put("/profile", async (req, res) => {
       displayName,
       licenseNumber,
       phone,
+      firstName,
+      lastName,
       address,
       city,
       state,
@@ -209,6 +221,19 @@ router.put("/profile", async (req, res) => {
       services: toNullIfBlank(services),
       updatedAt: new Date(),
     };
+
+    // ✅ Sync User Phone & Name if provided
+    const userData = {};
+    if (phone) userData.phone = String(phone).trim();
+    if (firstName) userData.firstName = String(firstName).trim();
+    if (lastName) userData.lastName = String(lastName).trim();
+
+    if (Object.keys(userData).length > 0) {
+      await prisma.user.update({
+        where: { id: String(userId) },
+        data: userData
+      });
+    }
 
     const saved = await prisma.pharmacyProfile.upsert({
       where: { userId: String(userId) },
@@ -370,7 +395,7 @@ router.get("/list", async (req, res) => {
     // Format for frontend
     const items = pharmacies.map(p => ({
       id: p.id,
-      name: p.displayName || p.user?.name || "Unnamed Pharmacy",
+      name: p.displayName || (p.user ? `${p.user.firstName} ${p.user.lastName}`.trim() : "Unnamed Pharmacy"),
       email: p.user?.email,
       phone: p.phone,
       address: p.address,
@@ -421,7 +446,9 @@ router.get("/patient/selected", async (req, res) => {
       mapId: s.id,
       pharmacyId: s.pharmacyId,
       preferred: s.preferred,
-      name: s.pharmacy.displayName || s.pharmacy.user.name,
+      pharmacyId: s.pharmacyId,
+      preferred: s.preferred,
+      name: s.pharmacy.displayName || (s.pharmacy.user ? `${s.pharmacy.user.firstName} ${s.pharmacy.user.lastName}`.trim() : "Pharmacy"),
       address: s.pharmacy.address,
       email: s.pharmacy.user.email,
       pharmacyProfile: s.pharmacy
@@ -571,7 +598,8 @@ router.get("/doctors-list", async (_req, res) => {
     });
     const data = list.map(d => ({
       id: d.id, // DoctorProfile ID
-      name: d.user?.name || "Unknown Doctor",
+      id: d.id, // DoctorProfile ID
+      name: d.user ? `${d.user.firstName} ${d.user.lastName}`.trim() : "Unknown Doctor",
       email: d.user?.email
     }));
     res.json({ success: true, data });
@@ -588,7 +616,8 @@ router.get("/patients-list", async (_req, res) => {
     });
     const data = list.map(p => ({
       id: p.id, // PatientProfile ID
-      name: p.user?.name || "Unknown Patient",
+      id: p.id, // PatientProfile ID
+      name: p.user ? `${p.user.firstName} ${p.user.lastName}`.trim() : "Unknown Patient",
       email: p.user?.email
     }));
     res.json({ success: true, data });

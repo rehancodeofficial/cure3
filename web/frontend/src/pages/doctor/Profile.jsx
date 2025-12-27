@@ -17,6 +17,9 @@ export default function DoctorProfile() {
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
     specialization: "",
     qualifications: "",
     licenseNumber: "",
@@ -35,6 +38,9 @@ export default function DoctorProfile() {
       const p = res.data?.data;
       if (p) {
         setForm({
+          firstName: p.user?.firstName || "",
+          lastName: p.user?.lastName || "",
+          phone: p.user?.phone || "",
           specialization: p.specialization || "",
           qualifications: p.qualifications || "",
           licenseNumber: p.licenseNumber || "",
@@ -107,6 +113,35 @@ export default function DoctorProfile() {
               <p className="text-[var(--text-soft)]">Loading...</p>
             ) : (
               <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div>
+                  <label className="block text-sm mb-1 text-[var(--text-soft)]">First Name</label>
+                  <input
+                    type="text"
+                    className="w-full rounded bg-[var(--bg-glass)] border border-[var(--border)] p-2 text-[var(--text-main)]"
+                    value={form.firstName}
+                    onChange={handleChange("firstName")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-[var(--text-soft)]">Last Name</label>
+                  <input
+                    type="text"
+                    className="w-full rounded bg-[var(--bg-glass)] border border-[var(--border)] p-2 text-[var(--text-main)]"
+                    value={form.lastName}
+                    onChange={handleChange("lastName")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-[var(--text-soft)]">Phone Number</label>
+                  <input
+                    type="text"
+                    className="w-full rounded bg-[var(--bg-glass)] border border-[var(--border)] p-2 text-[var(--text-main)]"
+                    value={form.phone}
+                    onChange={handleChange("phone")}
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm mb-1 text-[var(--text-soft)]">Specialization</label>
                   <input

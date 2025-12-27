@@ -163,9 +163,9 @@ export default function Sidebar({ role: propRole }) {
 
   return (
     <div
-      className={`h-screen sticky top-0 bg-[var(--bg-card)] border-r border-[var(--border)] transition-all duration-500 ease-in-out flex flex-col z-[60] ${
+      className={`h-screen sticky top-0 border-r border-[var(--border)] transition-all duration-500 ease-in-out flex flex-col z-[60] ${
         open ? 'w-72' : 'w-24'
-      }`}
+      } ${theme === 'light' ? 'bg-gradient-to-b from-green-50 via-emerald-50 to-green-50' : 'bg-[var(--bg-card)]'}`}
     >
       {/* Brand Logo Section */}
       <div className="p-6 mb-4">

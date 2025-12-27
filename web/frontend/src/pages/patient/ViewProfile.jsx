@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import api from '../../Lib/api';
 import { ToastContainer, toast } from 'react-toastify';
+import EditProfileModal from './EditProfileModal';
 import 'react-toastify/dist/ReactToastify.css';
 
 function formatDate(iso) {
@@ -47,6 +48,7 @@ export default function PatientViewProfile() {
 
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const loadProfile = useCallback(async () => {
     try {
@@ -54,7 +56,7 @@ export default function PatientViewProfile() {
       const res = await api.get('/patient/profile', { params: { userId } });
       setProfile(res.data?.data || null);
     } catch (err) {
-      toast.error('Profile NOT UPDATED.');
+      toast.error('Failed to load profile.');
     } finally {
       setLoading(false);
     }
@@ -63,6 +65,10 @@ export default function PatientViewProfile() {
   useEffect(() => {
     if (userId) loadProfile();
   }, [loadProfile, userId]);
+
+  const handleProfileUpdate = (updatedProfile) => {
+    setProfile(updatedProfile);
+  };
 
   return (
     <DashboardLayout role={role} user={{ name: userName }}>
@@ -76,9 +82,12 @@ export default function PatientViewProfile() {
               View Profile
             </h1>
           </div>
-          <a href="/patient/profile" className="btn btn-primary">
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="btn btn-primary"
+          >
             Update Profile
-          </a>
+          </button>
         </div>
 
         <div className="card !p-8">
@@ -139,9 +148,9 @@ export default function PatientViewProfile() {
                     {[
                       {
                         label: 'Date of Birth',
-                        value: formatDate(profile.dateOfBirth),
+                        value: formatDate(profile.user?.dateOfBirth || profile.dateOfBirth),
                       },
-                      { label: 'Gender', value: humanGender(profile.gender) },
+                      { label: 'Gender', value: humanGender(profile.user?.gender || profile.gender) },
                       {
                         label: 'Blood Group',
                         value: humanBlood(profile.bloodGroup),
@@ -252,6 +261,12 @@ export default function PatientViewProfile() {
           )}
         </div>
       </div>
+      <EditProfileModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        profile={profile} 
+        onProfileUpdate={handleProfileUpdate}
+      />
       <ToastContainer position="top-right" autoClose={2200} />
     </DashboardLayout>
   );

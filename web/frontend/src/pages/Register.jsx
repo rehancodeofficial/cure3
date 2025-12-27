@@ -178,7 +178,7 @@ export default function Register() {
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="grid sm:grid-cols-3 gap-2">
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                   First
                 </label>
                 <input
@@ -191,7 +191,7 @@ export default function Register() {
                 />
               </div>
                <div className="space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                   Middle
                 </label>
                 <input
@@ -203,7 +203,7 @@ export default function Register() {
                 />
               </div>
                <div className="space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                   Last
                 </label>
                 <input
@@ -219,7 +219,7 @@ export default function Register() {
 
              <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                         Date of Birth
                     </label>
                      <input
@@ -227,19 +227,19 @@ export default function Register() {
                         name="dateOfBirth"
                         value={form.dateOfBirth}
                         onChange={handleChange}
-                        className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 px-4 text-xs font-bold focus:border-[var(--brand-blue)] outline-none transition-all shadow-inner"
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 px-4 text-xs font-bold focus:border-[var(--brand-green)] outline-none transition-all shadow-inner"
                         required
                     />
                 </div>
                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                         Gender
                     </label>
                     <select
                         name="gender"
                         value={form.gender}
                         onChange={handleChange}
-                        className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 px-4 text-xs font-bold focus:border-[var(--brand-blue)] outline-none transition-all shadow-inner appearance-none"
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 px-4 text-xs font-bold focus:border-[var(--brand-green)] outline-none transition-all shadow-inner appearance-none"
                     >
                         <option value="MALE">Male</option>
                         <option value="FEMALE">Female</option>
@@ -251,11 +251,11 @@ export default function Register() {
 
 
             <div className="space-y-1.5">
-              <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+              <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                 Email Address
               </label>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-blue)] transition-all">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-green)] transition-all">
                   <FiMail />
                 </div>
                 <input
@@ -263,7 +263,7 @@ export default function Register() {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 pl-12 pr-4 text-xs font-bold focus:border-[var(--brand-blue)] outline-none transition-all shadow-inner"
+                  className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 pl-12 pr-4 text-xs font-bold focus:border-[var(--brand-green)] outline-none transition-all shadow-inner"
                   placeholder="address@meta"
                   required
                 />
@@ -272,11 +272,11 @@ export default function Register() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                   Auth Secret
                 </label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-orange)] transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-green)] transition-all">
                     <FiLock />
                   </div>
                   <input
@@ -284,7 +284,7 @@ export default function Register() {
                     name="password"
                     value={form.password}
                     onChange={handleChange}
-                    className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 pl-12 pr-12 text-xs font-bold focus:border-[var(--brand-orange)] outline-none transition-all shadow-inner"
+                    className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 pl-12 pr-12 text-xs font-bold focus:border-[var(--brand-green)] outline-none transition-all shadow-inner"
                     placeholder="••••••••"
                     minLength={6}
                     required
@@ -293,11 +293,11 @@ export default function Register() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                   Confirm Secret
                 </label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-orange)] transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-green)] transition-all">
                     <FiLock />
                   </div>
                   <input
@@ -305,7 +305,7 @@ export default function Register() {
                     name="confirmPassword"
                     value={form.confirmPassword}
                     onChange={handleChange}
-                    className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 pl-12 pr-4 text-xs font-bold focus:border-[var(--brand-orange)] outline-none transition-all shadow-inner"
+                    className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-3.5 pl-12 pr-4 text-xs font-bold focus:border-[var(--brand-green)] outline-none transition-all shadow-inner"
                     placeholder="••••••••"
                     required
                   />
@@ -321,7 +321,7 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+              <label className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                 Account Protocol
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

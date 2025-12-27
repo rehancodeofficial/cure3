@@ -98,7 +98,7 @@ export const deleteAdmin = async (id) => {
 
 // 🧾 System Reports
 export const fetchSystemReports = async () => {
-  const res = await api.get("/reports/summary");
+  const res = await api.get("/superadmin/reports/summary");
   return res.data;
 };
 

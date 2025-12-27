@@ -104,8 +104,8 @@ async function listMessages(req, res) {
           // Include all possible relation fields so frontend can display names
           sender: { select: { id: true, firstName: true, lastName: true, email: true, role: true} },
           receiver:{ select: { id: true, firstName: true, lastName: true, email: true, role: true} },
-          adminSender: { select: { id: true, firstName: true, lastName: true, email: true, role: true} },
-          adminReceiver:{ select: { id: true, firstName: true, lastName: true, email: true, role: true} },
+          adminSender: { select: { id: true, name: true, email: true, role: true} },
+          adminReceiver:{ select: { id: true, name: true, email: true, role: true} },
         },
       }),
     ]);
@@ -113,8 +113,17 @@ async function listMessages(req, res) {
     // Normalize output for frontend (so it just sees "sender" and "receiver" objects)
     const data = rows.map(msg => {
         // Resolve effective sender/receiver
-        const effSender = msg.sender || msg.adminSender;
-        const effReceiver = msg.receiver || msg.adminReceiver;
+        let effSender = msg.sender || msg.adminSender;
+        let effReceiver = msg.receiver || msg.adminReceiver;
+
+        // Normalize Admin name to firstName/lastName for frontend consistency
+        if (msg.adminSender) {
+            effSender = { ...effSender, firstName: effSender.name, lastName: " (Admin)" };
+        }
+        if (msg.adminReceiver) {
+            effReceiver = { ...effReceiver, firstName: effReceiver.name, lastName: " (Admin)" };
+        }
+
         return {
             ...msg,
             sender: effSender,
@@ -361,12 +370,25 @@ router.post("/send", verifyToken, async (req, res) => {
         readAt: true,
         sender: { select: { id: true, firstName: true, lastName: true, role: true } },
         receiver: { select: { id: true, firstName: true, lastName: true, role: true } },
-        adminSender: { select: { id: true, firstName: true, lastName: true, role: true } },
-        adminReceiver: { select: { id: true, firstName: true, lastName: true, role: true } },
+        adminSender: { select: { id: true, name: true, role: true } },
+        adminReceiver: { select: { id: true, name: true, role: true } },
       },
     });
 
-    return res.json({ data: msg });
+    // Normalize response for immediate UI update
+    const normalizeUser = (u, isAdmin) => {
+        if (!u) return null;
+        if (isAdmin) return { ...u, firstName: u.name, lastName: " (Admin)" };
+        return u;
+    };
+
+    const finalMsg = {
+        ...msg,
+        sender: normalizeUser(msg.sender || msg.adminSender, !!msg.adminSender),
+        receiver: normalizeUser(msg.receiver || msg.adminReceiver, !!msg.adminReceiver)
+    };
+
+    return res.json({ data: finalMsg });
   } catch (e) {
     console.error("❌ send message error:", e);
     return res.status(500).json({ error: "Failed to send message" });

@@ -4,6 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const axios = require("axios");
 const Stripe = require("stripe");
 const { verifyToken, requireRole, verifyOwnerOrAdmin } = require("../middleware/rbac.js");
+const { ensureDefaultProfile } = require("../lib/provisionProfile.js");
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -32,6 +33,52 @@ async function getPatientProfileIdByUserId(userId) {
   });
   return row?.id || null;
 }
+
+/**
+ * GET /api/patient/profile  (Current User)
+ */
+// GET /api/patient/profile  (Current User)
+router.get("/profile", async (req, res) => {
+  try {
+    const userId = req.user?.id || req.query.userId;
+    if (!userId) return res.status(400).json({ error: "User identity missing" });
+
+    const user = await prisma.user.findUnique({ where: { id: String(userId) } });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    let patient = await prisma.patientProfile.findUnique({
+      where: { userId: String(userId) },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, dateOfBirth: true, gender: true } },
+        appointments: true,
+        prescriptions: true,
+        consultations: true,
+      },
+    });
+
+    // Auto-create if missing (Robustness fix)
+    if (!patient && user.role === "PATIENT") {
+      patient = await ensureDefaultProfile(user);
+      // Re-fetch with includes
+      patient = await prisma.patientProfile.findUnique({
+        where: { userId: String(userId) },
+        include: {
+          user: { select: { id: true, firstName: true, lastName: true, email: true, dateOfBirth: true, gender: true } },
+          appointments: true,
+          prescriptions: true,
+          consultations: true,
+        },
+      });
+    }
+
+    if (!patient) return res.status(404).json({ success: false, message: "Profile not found" });
+
+    return res.json({ success: true, data: patient });
+  } catch (err) {
+    console.error("GET /api/patient/profile error:", err);
+    return res.status(500).json({ success: false, error: "Failed to fetch profile" });
+  }
+});
 
 /* ==================================================
    1) PATIENT DASHBOARD STATS
@@ -801,36 +848,20 @@ router.delete("/messages/delete/:id", async (req, res) => {
 });
 
 // --- PATIENT PROFILE ---
-// routes/patientRoutes.js
-
-// GET /api/patient/profile?userId=...
-router.get("/profile", async (req, res) => {
-  try {
-    const { userId } = req.query;
-    if (!userId) return res.status(400).json({ error: "userId is required" });
-
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    let profile = await prisma.patientProfile.findUnique({ where: { userId } });
-    if (!profile && user.role === "PATIENT") {
-      profile = await ensureDefaultProfile(user);
-    }
-
-    if (!profile) return res.status(404).json({ error: "Profile not found" });
-
-    return res.json({ data: profile });
-  } catch (e) {
-    console.error("❌ patient profile GET error:", e);
-    return res.status(500).json({ error: "Failed to load profile" });
-  }
-});
-
+// PUT /api/patient/profile
 // PUT /api/patient/profile
 router.put("/profile", async (req, res) => {
   try {
+    console.log("🔍 PUT /profile - req.user:", req.user);
+    console.log("🔍 PUT /profile - req.body.userId:", req.body.userId);
+    
+    const userId = req.user?.id || req.body.userId;
+    console.log("🔍 PUT /profile BODY:", JSON.stringify(req.body, null, 2));
+
     const {
-      userId,
+      firstName, // ✅ Extract Name
+      lastName,  // ✅ Extract Name
+      phone,     // ✅ Extract Phone
       dateOfBirth,
       gender,
       bloodGroup,
@@ -846,50 +877,136 @@ router.put("/profile", async (req, res) => {
       insuranceMemberId,
     } = req.body || {};
 
-    if (!userId) return res.status(400).json({ error: "userId is required" });
+    console.log("🔍 Extracted userId:", userId);
+    
+    if (!userId) {
+      console.error("❌ userId is missing - req.user:", req.user, "req.body.userId:", req.body.userId);
+      return res.status(400).json({ error: "userId is required" });
+    }
 
-    // upsert so first save creates if missing
-    const updated = await prisma.patientProfile.upsert({
-      where: { userId },
-      update: {
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : new Date("1990-01-01T00:00:00.000Z"),
-        gender: gender || "OTHER",
-        bloodGroup: bloodGroup || "UNKNOWN",
-        height: height ?? null,
-        weight: weight ?? null,
-        allergies: allergies ?? "",
-        medications: medications ?? "",
-        medicalHistory: medicalHistory ?? "",
-        address: address ?? "",
-        emergencyContact: emergencyContact ?? "",
-        medicalRecordNumber: medicalRecordNumber ?? null,
-        insuranceProvider: insuranceProvider ?? "",
-        insuranceMemberId: insuranceMemberId ?? "",
-      },
-      create: {
-        userId,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : new Date("1990-01-01T00:00:00.000Z"),
-        gender: gender || "OTHER",
-        bloodGroup: bloodGroup || "UNKNOWN",
-        height: height ?? null,
-        weight: weight ?? null,
-        allergies: allergies ?? "",
-        medications: medications ?? "",
-        medicalHistory: medicalHistory ?? "",
-        address: address ?? "",
-        emergencyContact: emergencyContact ?? "",
-        medicalRecordNumber: medicalRecordNumber ?? null,
-        insuranceProvider: insuranceProvider ?? "",
-        insuranceMemberId: insuranceMemberId ?? "",
-      },
-    });
+    // Map Blood Group from frontend (A+, A-) to Prisma Enum (A_POSITIVE, A_NEGATIVE)
+    const bloodMap = {
+      "A+": "A_POSITIVE",
+      "A-": "A_NEGATIVE",
+      "B+": "B_POSITIVE",
+      "B-": "B_NEGATIVE",
+      "AB+": "AB_POSITIVE",
+      "AB-": "AB_NEGATIVE",
+      "O+": "O_POSITIVE",
+      "O-": "O_NEGATIVE",
+      "UNKNOWN": "UNKNOWN",
+      "A_POS": "A_POSITIVE",
+      "A_NEG": "A_NEGATIVE",
+      "B_POS": "B_POSITIVE",
+      "B_NEG": "B_NEGATIVE",
+      "AB_POS": "AB_POSITIVE",
+      "AB_NEG": "AB_NEGATIVE",
+      "O_POS": "O_POSITIVE",
+      "O_NEG": "O_NEGATIVE",
+    };
+    const mappedBlood = bloodMap[bloodGroup] || bloodGroup;
 
-    return res.json({ data: updated });
+    // Map Gender from frontend (Male, Female) to Prisma Enum (MALE, FEMALE)
+    const genderMap = {
+      "Male": "MALE",
+      "Female": "FEMALE",
+      "Other": "OTHER",
+      "MALE": "MALE",
+      "FEMALE": "FEMALE",
+      "OTHER": "OTHER"
+    };
+    const mappedGender = genderMap[gender] || gender;
+
+    console.log("🔍 Mapped values - Blood:", mappedBlood, "Gender:", mappedGender);
+
+    // Prepare User update data
+    const userData = {
+      ...(firstName ? { firstName } : {}), // ✅ Update Name
+      ...(lastName ? { lastName } : {}),   // ✅ Update Name
+      ...(phone ? { phone } : {}),         // ✅ Update Phone
+      ...(dateOfBirth ? { dateOfBirth: new Date(dateOfBirth) } : {}),
+      ...(mappedGender ? { gender: mappedGender } : {}),
+    };
+
+    // Prepare operations for transaction
+    const operations = [];
+
+    // Only update User if there's data to update
+    if (Object.keys(userData).length > 0) {
+      operations.push(
+        prisma.user.update({
+          where: { id: String(userId) },
+          data: userData,
+        })
+      );
+    }
+
+    // Always upsert PatientProfile
+    operations.push(
+      prisma.patientProfile.upsert({
+        where: { userId: String(userId) },
+        update: {
+          bloodGroup: mappedBlood,
+          height: height !== undefined ? Number(height) : undefined,
+          weight: weight !== undefined ? Number(weight) : undefined,
+          allergies: allergies,
+          medications: medications,
+          medicalHistory: medicalHistory,
+          address: address,
+          emergencyContact: emergencyContact,
+          medicalRecordNumber: medicalRecordNumber,
+          insuranceProvider: insuranceProvider,
+          insuranceMemberId: insuranceMemberId,
+        },
+        create: {
+          userId: String(userId),
+          bloodGroup: mappedBlood || "UNKNOWN",
+          height: height !== undefined ? Number(height) : null,
+          weight: weight !== undefined ? Number(weight) : null,
+          allergies: allergies || "",
+          medications: medications || "",
+          medicalHistory: medicalHistory || "",
+          address: address || "",
+          emergencyContact: emergencyContact || "",
+          medicalRecordNumber: medicalRecordNumber || null,
+          insuranceProvider: insuranceProvider || "",
+          insuranceMemberId: insuranceMemberId || "",
+        },
+      })
+    );
+
+    // Execute transaction
+    const results = await prisma.$transaction(operations);
+    
+    // Extract results (order depends on whether user update was included)
+    const updatedUser = Object.keys(userData).length > 0 ? results[0] : await prisma.user.findUnique({ where: { id: String(userId) } });
+    const updatedProfile = Object.keys(userData).length > 0 ? results[1] : results[0];
+
+    console.log("✅ Profile updated successfully for userId:", userId);
+
+    // Return the consolidated profile
+    const finalProfile = {
+      ...updatedProfile,
+      user: {
+        id: updatedUser.id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        phone: updatedUser.phone, // ✅ Return Phone
+        dateOfBirth: updatedUser.dateOfBirth,
+        gender: updatedUser.gender
+      }
+    };
+
+    return res.json({ success: true, data: finalProfile });
   } catch (e) {
     console.error("❌ patient profile PUT error:", e);
-    return res.status(500).json({ error: "Failed to save profile" });
+    console.error("❌ Error stack:", e.stack);
+    // Prisma validation errors usually have a message property
+    return res.status(500).json({ error: e.message || "Failed to save profile" });
   }
 });
+
 
 // PATCH /api/patient/select-pharmacy
 // body: { patientUserId, pharmacyId }
@@ -921,112 +1038,6 @@ router.patch("/select-pharmacy", async (req, res) => {
 
 module.exports = router;
 
-//=================================================================================================================
-// If you have auth middleware, prefer req.user.id; fall back to query for now.
-// router.get("/profile", async (req, res) => {
-//   try {
-//     const userId = req.user?.id || req.query.userId;
-//     if (!userId) return res.status(400).json({ error: "Missing userId" });
-
-//     let profile = await prisma.patientProfile.findUnique({
-//       where: { userId },
-//       include: { user: true },
-//     });
-
-//     if (!profile) {
-//       // ⚠️ Ensure these enum values exist in your schema:
-//       // Gender: MALE | FEMALE | OTHER
-//       // BloodGroup: A_POS | A_NEG | B_POS | B_NEG | AB_POS | AB_NEG | O_POS | O_NEG
-//       const DEFAULT_GENDER = "OTHER";
-//       const DEFAULT_BLOOD = "O_POS";
-
-//       profile = await prisma.patientProfile.create({
-//         data: {
-//           userId,
-//           dateOfBirth: new Date("1900-01-01T00:00:00.000Z"),
-//           gender: DEFAULT_GENDER,
-//           bloodGroup: DEFAULT_BLOOD,
-//           // everything else is optional in your schema
-//         },
-//         include: { user: true },
-//       });
-//     }
-
-//     return res.json({ success: true, data: profile });
-//   } catch (err) {
-//     console.error("❌ GET /patient/profile error:", err);
-//     return res.status(500).json({ error: "Failed to load patient profile" });
-//   }
-// });
-
-// // Optional: update endpoint for completing the profile
-// router.put("/profile", async (req, res) => {
-//   try {
-//     const userId = req.user?.id || req.body.userId;
-//     if (!userId) return res.status(400).json({ error: "Missing userId" });
-
-//     // Only allow fields your UI actually edits:
-//     const {
-//       dateOfBirth,
-//       gender,
-//       bloodGroup,
-//       height,
-//       weight,
-//       allergies,
-//       medications,
-//       medicalHistory,
-//       address,
-//       emergencyContact,
-//       medicalRecordNumber,
-//       insuranceProvider,
-//       insuranceMemberId,
-//     } = req.body;
-
-//     // Ensure profile exists (lazy-create minimal if needed)
-//     let profile = await prisma.patientProfile.findUnique({ where: { userId } });
-//     if (!profile) {
-//       const DEFAULT_GENDER = "OTHER";
-//       const DEFAULT_BLOOD = "O_POS";
-//       profile = await prisma.patientProfile.create({
-//         data: {
-//           userId,
-//           dateOfBirth: new Date("1900-01-01T00:00:00.000Z"),
-//           gender: DEFAULT_GENDER,
-//           bloodGroup: DEFAULT_BLOOD,
-//         },
-//       });
-//     }
-
-//     const updated = await prisma.patientProfile.update({
-//       where: { userId },
-//       data: {
-//         ...(dateOfBirth ? { dateOfBirth: new Date(dateOfBirth) } : {}),
-//         ...(gender ? { gender } : {}),
-//         ...(bloodGroup ? { bloodGroup } : {}),
-//         ...(height !== undefined ? { height: Number(height) } : {}),
-//         ...(weight !== undefined ? { weight: Number(weight) } : {}),
-//         ...(allergies !== undefined ? { allergies } : {}),
-//         ...(medications !== undefined ? { medications } : {}),
-//         ...(medicalHistory !== undefined ? { medicalHistory } : {}),
-//         ...(address !== undefined ? { address } : {}),
-//         ...(emergencyContact !== undefined ? { emergencyContact } : {}),
-//         ...(medicalRecordNumber !== undefined ? { medicalRecordNumber } : {}),
-//         ...(insuranceProvider !== undefined ? { insuranceProvider } : {}),
-//         ...(insuranceMemberId !== undefined ? { insuranceMemberId } : {}),
-//       },
-//       include: { user: true },
-//     });
-
-//     return res.json({ success: true, data: updated });
-//   } catch (err) {
-//     console.error("❌ PUT /patient/profile error:", err);
-//     // Unique MRN violation? Return friendly message:
-//     if (err?.code === "P2002" && err?.meta?.target?.includes("medicalRecordNumber")) {
-//       return res.status(400).json({ error: "Medical Record Number already exists." });
-//     }
-//     return res.status(500).json({ error: "Failed to update profile" });
-//   }
-// });
 
 /* ==================================================
    PHARMACY ORDERING & MANAGEMENT

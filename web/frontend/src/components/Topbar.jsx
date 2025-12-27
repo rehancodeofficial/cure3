@@ -76,7 +76,9 @@ export default function Topbar({ userName }) {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-[80px] flex items-center justify-between px-8 bg-[var(--bg-glass)] backdrop-blur-xl border-b border-[var(--border)]">
+    <header className={`sticky top-0 z-50 h-[80px] flex items-center justify-between px-8 backdrop-blur-xl border-b border-[var(--border)] ${
+      theme === 'light' ? 'bg-gradient-to-r from-green-50 via-emerald-50 to-green-50' : 'bg-[var(--bg-glass)]'
+    }`}>
       {/* Search / Breadcrumbs Area */}
       <div className="flex-1 max-w-md hidden md:flex items-center gap-3">
         <img src="/images/logo/Asset2.png" alt="Logo" className="w-8 h-8" />

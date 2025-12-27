@@ -191,7 +191,7 @@ export default function VideoCallModal({ consultation, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/90 flex justify-center items-center z-50">
-      <div className="bg-[#0d1117] rounded-2xl w-11/12 md:w-4/5 lg:w-3/5 h-[80vh] flex flex-col overflow-hidden relative">
+      <div className="bg-[var(--bg-card)] rounded-2xl w-11/12 md:w-4/5 lg:w-3/5 h-[80vh] flex flex-col overflow-hidden relative">
         {/* Close Button */}
         <button
           onClick={onClose}

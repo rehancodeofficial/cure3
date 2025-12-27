@@ -16,6 +16,9 @@ export default function PharmacyProfile() {
 
   const [form, setForm] = useState({
     userId,
+    userId,
+    firstName: "",
+    lastName: "",
     displayName: "",
     licenseNumber: "",
     phone: "",
@@ -35,9 +38,11 @@ export default function PharmacyProfile() {
 
   const normalizeLoaded = (p = {}) => ({
     userId,
+    firstName: p.user?.firstName ?? "",
+    lastName: p.user?.lastName ?? "",
     displayName: p.displayName ?? "",
     licenseNumber: p.licenseNumber ?? "",
-    phone: p.phone ?? "",
+    phone: p.user?.phone || p.phone || "", // Prefer user phone, fallback to profile phone
     address: p.address ?? "",
     city: p.city ?? "",
     state: p.state ?? "",
@@ -140,7 +145,21 @@ export default function PharmacyProfile() {
           ) : (
             <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
               <FI
-                label="Display Name"
+                label="First Name"
+                value={form.firstName}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, firstName: e.target.value }))
+                }
+              />
+              <FI
+                label="Last Name"
+                value={form.lastName}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, lastName: e.target.value }))
+                }
+              />
+              <FI
+                label="Display Name (Business Name)"
                 value={form.displayName}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, displayName: e.target.value }))

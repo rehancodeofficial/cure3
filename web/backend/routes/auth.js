@@ -23,7 +23,7 @@ const ALLOWED_ADMIN_ROLES = new Set(['SUPERADMIN', 'ADMIN', 'SUPPORT']);
 // If role is missing/invalid → defaults to PATIENT
 router.post('/register', async (req, res) => {
   try {
-    let { firstName, middleName, lastName, email, password, role, dateOfBirth, gender } = req.body || {};
+    let { firstName, middleName, lastName, email, phone, password, role, dateOfBirth, gender } = req.body || {};
 
     if (!firstName || !lastName || !email || !password || !dateOfBirth || !gender) {
       return res
@@ -77,6 +77,7 @@ router.post('/register', async (req, res) => {
         middleName,
         lastName,
         email,
+        phone: phone || null,
         password: hashed,
         role: userRole,
         dateOfBirth: new Date(dateOfBirth),

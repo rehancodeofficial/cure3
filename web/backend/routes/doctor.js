@@ -101,7 +101,7 @@ router.get("/stats", async (req, res) => {
 // GET /api/doctor/profile?userId=...
 router.get("/profile", async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.query.userId || req.user?.id;
     if (!userId) return res.status(400).json({ error: "userId is required" });
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -126,6 +126,9 @@ router.put("/profile", async (req, res) => {
   try {
     const {
       userId,
+      firstName, // ✅ Extract Name
+      lastName,  // ✅ Extract Name
+      phone,     // ✅ Extract Phone
       specialization,
       qualifications,
       licenseNumber,
@@ -138,6 +141,20 @@ router.put("/profile", async (req, res) => {
     } = req.body || {};
 
     if (!userId) return res.status(400).json({ error: "userId is required" });
+
+    // ✅ Update User fields (Name, Phone)
+    const userData = {
+      ...(firstName ? { firstName } : {}),
+      ...(lastName ? { lastName } : {}),
+      ...(phone ? { phone } : {}),
+    };
+
+    if (Object.keys(userData).length > 0) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: userData,
+      });
+    }
 
     const updated = await prisma.doctorProfile.upsert({
       where: { userId },
@@ -397,7 +414,13 @@ router.patch("/appointments/:id", async (req, res) => {
    2️⃣  GET /api/doctor/appointments — Fetch All
    ====================================================== */
 router.get("/appointments", async (req, res) => {
-  const { doctorId } = req.query; // doctorId = User.id
+  const doctorId = req.query.doctorId || req.user?.id; // doctorId = User.id
+  
+  console.log("DEBUG: GET /doctor/appointments", { 
+      query: req.query, 
+      user: req.user, 
+      resolvedDoctorId: doctorId 
+  });
 
   if (!doctorId)
     return res.status(400).json({ error: "doctorId (User ID) is required" });

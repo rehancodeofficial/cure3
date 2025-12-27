@@ -173,7 +173,7 @@ export default function DoctorInbox() {
                     style={{ width: 120, height: "auto" }}
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }} // fallback if missing
                   />
-        <h1 className="text-2xl font-bold mb-6 text-[#ffffff]">Dr Inbox</h1>
+        <h1 className="text-2xl font-bold mb-6 text-[var(--text-main)]">Dr Inbox</h1>
 
         {loading ? (
           <p>Loading messages...</p>
@@ -183,7 +183,7 @@ export default function DoctorInbox() {
           <div className="overflow-x-auto bg-[var(--bg-glass)] backdrop-blur-md rounded-2xl p-6 shadow-lg">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-[var(--border)] text-[#E2FCE3]">
+                <tr className="border-b border-[var(--border)] text-[var(--text-main)] bg-[var(--bg-glass)]">
                   <th className="p-3">From</th>
                   <th className="p-3">Message</th>
                   <th className="p-3">Date</th>
@@ -197,12 +197,16 @@ export default function DoctorInbox() {
                 return (
                   <tr
                     key={msg.id}
-                    className={`border-b border-white/10 hover:bg-white/10 transition cursor-pointer ${
-                      isRead ? "text-white/70" : "font-semibold"
+                    className={`border-b border-[var(--border)] hover:bg-[var(--bg-main)] transition cursor-pointer ${
+                      isRead ? "text-[var(--text-soft)]" : "font-semibold"
                     }`}
                     onClick={() => openMessage(msg)}
                   >
-                    <td className="p-3">{msg.sender?.name || "Unknown"}</td>
+                    <td className="p-3">
+                      {msg.sender?.firstName
+                        ? `${msg.sender.firstName} ${msg.sender.lastName || ""}`
+                        : msg.sender?.name || "Unknown"}
+                    </td>
                     <td className="p-3 truncate max-w-xs">{msg.content}</td>
                     <td className="p-3">{new Date(msg.createdAt).toLocaleString()}</td>
                     <td className="p-3 text-center">
@@ -254,7 +258,9 @@ export default function DoctorInbox() {
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }} // fallback if missing
                   />
                 <h4 className="text-xl font-bold text-[#190366]">
-                  From {selectedMessage.sender?.name || "Unknown"}
+                  From {selectedMessage.sender?.firstName
+                    ? `${selectedMessage.sender.firstName} ${selectedMessage.sender.lastName || ""}`
+                    : selectedMessage.sender?.name || "Unknown"}
                 </h4>
                 <button
                   title="Delete"

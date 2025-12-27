@@ -184,7 +184,7 @@ const openMessage = async (msg) => {
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }} // fallback if missing
                   />
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-[#FFFFFF]">Patient Inbox</h1>
+            <h1 className="text-2xl font-bold text-[var(--text-main)]">Patient Inbox</h1>
           </div>
 
           {loading ? (
@@ -195,7 +195,7 @@ const openMessage = async (msg) => {
             <div className="overflow-x-auto bg-[var(--bg-glass)] backdrop-blur-md rounded-2xl p-6 shadow-lg">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-[var(--border)] text-[#E2FCE3]">
+                  <tr className="border-b border-[var(--border)] text-[var(--text-main)] bg-[var(--bg-glass)]">
                     <th className="p-3">From</th>
                     <th className="p-3">Message</th>
                     <th className="p-3">Date</th>
@@ -210,12 +210,16 @@ const openMessage = async (msg) => {
                         return (
                           <tr
                             key={msg.id}
-                            className={`border-b border-white/10 hover:bg-white/10 transition cursor-pointer ${
-                              isRead ? "text-white/70" : "font-semibold"
+                            className={`border-b border-[var(--border)] hover:bg-[var(--bg-main)] transition cursor-pointer ${
+                              isRead ? "text-[var(--text-soft)]" : "font-semibold text-[var(--text-main)]"
                             }`}
                             onClick={() => openMessage(msg)}
                           >
-                            <td className="p-3">{msg.sender?.name || "Unknown"}</td>
+                            <td className="p-3">
+                              {msg.sender?.firstName
+                                ? `${msg.sender.firstName} ${msg.sender.lastName || ""}`
+                                : msg.sender?.name || "Unknown"}
+                            </td>
                             <td className="p-3 truncate max-w-xs">{msg.content}</td>
                             <td className="p-3">{new Date(msg.createdAt).toLocaleString()}</td>
 
@@ -270,7 +274,9 @@ const openMessage = async (msg) => {
                 {/* Header with inline delete */}
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-[#190366]">
-                    From {selectedMessage.sender?.name || "Unknown"}
+                    From {selectedMessage.sender?.firstName
+                      ? `${selectedMessage.sender.firstName} ${selectedMessage.sender.lastName || ""}`
+                      : selectedMessage.sender?.name || "Unknown"}
                   </h2>
                   <button
                     title="Delete"

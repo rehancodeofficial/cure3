@@ -91,7 +91,7 @@ export default function Login() {
           <div className="z-10">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 mb-12 text-[var(--text-main)]/60 hover:text-white transition-all group font-black text-[10px] uppercase tracking-[0.2em]"
+              className="inline-flex items-center gap-2 mb-12 text-[var(--brand-green)] hover:text-white transition-all group font-black text-[10px] uppercase tracking-[0.2em]"
             >
               <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
               Home
@@ -108,11 +108,11 @@ export default function Login() {
                   CURE<span className="text-[var(--brand-blue)]">VIRTUAL</span>
                 </span>
               </div>
-              <h2 className="text-4xl font-black tracking-tighter mb-4 leading-none uppercase">
+              <h2 className="text-4xl font-black tracking-tighter mb-4 leading-none uppercase text-[var(--brand-green)]">
                 Systems <br />{' '}
                 <span className="text-[var(--brand-green)]">Nominal.</span>
               </h2>
-              <p className="text-[var(--text-main)]/60 text-sm leading-relaxed max-w-xs font-bold uppercase tracking-widest italic">
+              <p className="text-[var(--brand-green)] text-sm leading-relaxed max-w-xs font-bold uppercase tracking-widest italic">
                 Secure portal entrance for the CureVirtual ecosystem.
               </p>
             </div>
@@ -120,7 +120,7 @@ export default function Login() {
 
           <div className="z-10 flex items-center gap-4">
             <div className="h-2 w-2 rounded-full bg-[var(--brand-orange)] animate-ping"></div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-main)]/40">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--brand-green)]">
               Secure Encryption Enabled
             </p>
           </div>
@@ -142,11 +142,11 @@ export default function Login() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+              <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                 Universal Email
               </label>
               <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-blue)] transition-all">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-green)] transition-all">
                   <FiMail />
                 </div>
                 <input
@@ -162,7 +162,7 @@ export default function Login() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)] ml-1">
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--brand-green)] ml-1">
                   Access Token
                 </label>
                 <Link
@@ -174,14 +174,14 @@ export default function Login() {
                 </Link>
               </div>
               <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-orange)] transition-all">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--brand-green)] transition-all">
                   <FiLock />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-4 pl-14 pr-14 text-sm font-bold focus:border-[var(--brand-orange)] outline-none transition-all shadow-inner"
+                  className="w-full bg-[var(--bg-main)] border border-[var(--border)] rounded-2xl py-4 pl-14 pr-14 text-sm font-bold focus:border-[var(--brand-green)] outline-none transition-all shadow-inner"
                   placeholder="••••••••"
                   required
                 />

@@ -169,7 +169,7 @@ export default function PharmacyInbox() {
   return (
     <DashboardLayout role="PHARMACY" user={user}>
       <div className="p-6 min-h-screen bg-[var(--bg-main)]/90 text-[var(--text-main)]">
-        <h1 className="text-2xl font-bold mb-6 text-[#ffffff]">Pharmacy Inbox</h1>
+        <h1 className="text-2xl font-bold mb-6 text-[var(--text-main)]">Pharmacy Inbox</h1>
 
         {loading ? (
           <p>Loading messages...</p>
@@ -179,7 +179,7 @@ export default function PharmacyInbox() {
           <div className="overflow-x-auto bg-[var(--bg-glass)] backdrop-blur-md rounded-2xl p-6 shadow-lg">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-[var(--border)] text-[#E2FCE3]">
+                <tr className="border-b border-[var(--border)] text-[var(--text-main)] bg-[var(--bg-glass)]">
                   <th className="p-3">From</th>
                   <th className="p-3">Message</th>
                   <th className="p-3">Date</th>
@@ -191,13 +191,15 @@ export default function PharmacyInbox() {
                {messages.map((msg) => {
                 const isRead = !!msg.readAt;
                 // Calculate display name from sender logic
-                const senderName = msg.sender?.name || (msg.adminSenderId ? "Admin" : "Unknown");
+                const senderName = msg.sender?.firstName
+                  ? `${msg.sender.firstName} ${msg.sender.lastName || ""}`
+                  : (msg.sender?.name || (msg.adminSenderId ? "Admin" : "Unknown"));
                 
                 return (
                   <tr
                     key={msg.id}
-                    className={`border-b border-white/10 hover:bg-white/10 transition cursor-pointer ${
-                      isRead ? "text-white/70" : "font-semibold"
+                    className={`border-b border-[var(--border)] hover:bg-[var(--bg-main)] transition cursor-pointer ${
+                      isRead ? "text-[var(--text-soft)]" : "font-semibold"
                     }`}
                     onClick={() => openMessage(msg)}
                   >
@@ -247,7 +249,9 @@ export default function PharmacyInbox() {
               {/* Header + inline delete */}
               <div className="flex items-center justify-between">
                 <h4 className="text-xl font-bold text-[#190366]">
-                  From {selectedMessage.sender?.name || (selectedMessage.adminSenderId ? "Admin" : "Unknown")}
+                  From {selectedMessage.sender?.firstName
+                    ? `${selectedMessage.sender.firstName} ${selectedMessage.sender.lastName || ""}`
+                    : (selectedMessage.sender?.name || (selectedMessage.adminSenderId ? "Admin" : "Unknown"))}
                 </h4>
                 <button
                   title="Delete"

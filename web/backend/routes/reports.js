@@ -40,7 +40,7 @@ router.get("/summary", async (req, res) => {
       prisma.supportTicket.count(),
       prisma.supportTicket.count({ where: { status: "OPEN" } }),
       prisma.supportTicket.count({ where: { status: "RESOLVED" } }),
-      prisma.user.count({ where: { subscription: "SUBSCRIBED" } }),
+      prisma.user.count({ where: { subscriptionState: "ACTIVE" } }),
     ]);
 
     res.json({
