@@ -15,7 +15,7 @@ function ViewModal({ open, onClose, item }) {
       <div className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-xl w-full max-w-lg relative text-[var(--text-main)]">
         <button onClick={onClose} className="absolute top-3 right-4 text-[var(--text-soft)] text-xl">✖</button>
         <img
-            src="/images/logo/Asset2.png"
+            src="/images/logo/Asset3.png"
             alt="CureVirtual"
             style={{ width: 120, height: "auto" }}
             onError={(e) => {
@@ -275,7 +275,7 @@ export default function PharmacyPrescriptions() {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-               <img src="/images/logo/Asset2.png" alt="CureVirtual" style={{ width: 120 }} />
+               <img src="/images/logo/Asset3.png" alt="CureVirtual" style={{ width: 120 }} />
                <h1 className="text-3xl font-bold text-[var(--text-main)]">
               {status === "INCOMING" || status === "SENT" 
                 ? "Incoming Prescriptions" 

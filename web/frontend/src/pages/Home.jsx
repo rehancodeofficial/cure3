@@ -35,7 +35,7 @@ export default function Home() {
           >
             <div className="bg-[var(--bg-glass)] p-2 rounded-xl group-hover:rotate-12 transition-transform">
               <img
-                src="/images/logo/Asset2.png"
+                src="/images/logo/Asset3.png"
                 alt="Logo"
                 className="w-7 h-7"
               />
@@ -89,7 +89,7 @@ export default function Home() {
 
             <div className="space-y-4">
               <img
-                src="/images/logo/Asset2.png"
+                src="/images/logo/Asset3.png"
                 alt="CureVirtual Logo"
                 className="w-24 h-auto mx-auto lg:mx-0 drop-shadow-lg"
               />
@@ -147,7 +147,7 @@ export default function Home() {
           <div className="relative hidden lg:block">
             <div className="glass !p-4 !rounded-[3rem] overflow-hidden border-[var(--border)] shadow-2xl animate-float">
               <img
-                src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1000"
+                src="/images/logo/Asset3.png"
                 alt="Telemedicine"
                 className="rounded-[2.5rem] w-full h-[500px] object-cover"
               />
@@ -239,11 +239,11 @@ export default function Home() {
                   Uptime Record
                 </p>
               </div>
-            </div>
+            </div>s
           </div>
           <div className="lg:w-1/2">
             <img
-              src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80"
+              src="/images/logo/Asset3.png"
               className="rounded-[3rem] shadow-2xl border border-[var(--border)]"
               alt="Modern Hospital"
             />
@@ -257,7 +257,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="bg-[var(--bg-glass)] p-2 rounded-xl shadow-sm border border-[var(--border)]">
               <img
-                src="/images/logo/Asset2.png"
+                src="/images/logo/Asset3.png"
                 alt="Logo"
                 className="w-6 h-6"
               />

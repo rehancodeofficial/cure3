@@ -128,7 +128,7 @@ export default function PatientPrescriptions() {
 
         <div className="flex justify-between items-center mb-6">
                           <img
-                    src="/images/logo/Asset2.png"
+                    src="/images/logo/Asset3.png"
                     alt="CureVirtual"
                     style={{ width: 120, height: "auto" }}
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }} // fallback if missing
@@ -204,7 +204,7 @@ export default function PatientPrescriptions() {
               ✖
             </button>
                 <img
-                    src="/images/logo/Asset2.png"
+                    src="/images/logo/Asset3.png"
                     alt="CureVirtual"
                     style={{ width: 120, height: "auto" }}
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }} // fallback if missing
@@ -222,7 +222,7 @@ export default function PatientPrescriptions() {
               <div className="flex items-center justify-between border-b pb-3">
                 <div className="flex items-center gap-3">
                   <img
-                    src="/images/logo/Asset2.png"
+                    src="/images/logo/Asset3.png"
                     alt="CureVirtual"
                     style={{ width: 120, height: "auto" }}
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }} // fallback if missing

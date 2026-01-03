@@ -130,7 +130,7 @@ export default function SubscriptionSettings() {
         <div className="p-6 space-y-6">
           <div className="flex items-center justify-between">
             <img
-              src="/images/logo/Asset2.png"
+              src="/images/logo/Asset3.png"
               alt="CureVirtual"
               style={{ width: 120, height: "auto" }}
               onError={(e) => {

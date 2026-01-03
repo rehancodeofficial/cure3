@@ -167,7 +167,7 @@ export default function PharmacySubscription() {
 
       <div className="flex items-center justify-between mb-6">
         <img
-          src="/images/logo/Asset2.png"
+          src="/images/logo/Asset3.png"
           alt="CureVirtual"
           style={{ width: 120, height: "auto" }}
           onError={(e) => {

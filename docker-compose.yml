@@ -37,5 +37,14 @@ services:
       - ./web/frontend:/app
       - /app/node_modules
 
+  python-chatbot:
+    build: ./web/python_backend
+    ports:
+      - '5002:5002'
+    env_file:
+      - ./web/python_backend/.env
+    volumes:
+      - ./web/python_backend:/app
+
 volumes:
   db_data:

@@ -30,7 +30,7 @@ export default function PatientSendMessage() {
         setDoctors(
           list.map((d) => ({
             id: d.user?.id || d.id, // fallback
-            name: d.user?.name || d.name || "Unnamed Doctor",
+            name: d.user ? `${d.user.firstName} ${d.user.lastName}`.trim() : (d.name || "Unnamed Doctor"),
             email: d.user?.email || d.email || "",
           }))
         );
@@ -78,7 +78,7 @@ export default function PatientSendMessage() {
 
         <div className="p-6">
                           <img
-                    src="/images/logo/Asset2.png"
+                    src="/images/logo/Asset3.png"
                     alt="CureVirtual"
                     style={{ width: 120, height: "auto" }}
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }} // fallback if missing

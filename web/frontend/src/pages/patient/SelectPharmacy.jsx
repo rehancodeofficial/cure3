@@ -54,7 +54,7 @@ export default function PatientSelectPharmacy() {
         <Topbar userName={userName} />
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <img src="/images/logo/Asset2.png" alt="CureVirtual" style={{ width: 120 }} />
+            <img src="/images/logo/Asset3.png" alt="CureVirtual" style={{ width: 120 }} />
             <h1 className="text-3xl font-bold text-[var(--text-main)]">Select Pharmacy</h1>
             <div>{msg}</div>
           </div>

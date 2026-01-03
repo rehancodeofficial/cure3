@@ -99,6 +99,7 @@ import UserProfile from './pages/shared/UserProfile';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
+import Chatbot from './components/Chatbot';
 
 /* ================================
    VIDEO (shared)
@@ -707,6 +708,7 @@ export default function App() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Chatbot />
     </BrowserRouter>
   );
 }

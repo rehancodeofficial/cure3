@@ -21,7 +21,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 
 // ✅ Health Check
@@ -102,6 +102,12 @@ app.use('/api/patient', patientRoutes);
 
 const notificationsRoutes = require('./routes/notifications');
 app.use('/api/notifications', notificationsRoutes);
+
+const chatbotRoutes = require('./routes/chatbot.routes');
+const internalRoutes = require('./routes/internal');
+
+app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/internal', internalRoutes);
 
 // ----------------------------
 // ✅ SUBSCRIPTION ROUTES

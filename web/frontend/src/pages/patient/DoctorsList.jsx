@@ -5,7 +5,7 @@ import api from "../../Lib/api";
 import { toast } from "react-toastify";
 import { FaEye, FaUserPlus, FaCalendarAlt } from "react-icons/fa";
 
-const PLACEHOLDER_LOGO = "/images/logo/Asset2.png";
+const PLACEHOLDER_LOGO = "/images/logo/Asset3.png";
 
 function DoctorViewModal({ open, onClose, doctor, onAssign }) {
   if (!open || !doctor) return null;
@@ -41,7 +41,7 @@ function DoctorViewModal({ open, onClose, doctor, onAssign }) {
 
         <div className="flex items-center gap-4 mb-8">
           <img
-            src="/images/logo/Asset2.png"
+            src="/images/logo/Asset3.png"
             alt="CureVirtual"
             className="w-24 h-auto"
             onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }}
@@ -256,7 +256,7 @@ export default function DoctorsList() {
         <div className="p-6 space-y-6">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <img
-              src="/images/logo/Asset2.png"
+              src="/images/logo/Asset3.png"
               alt="CureVirtual"
               style={{ width: 120, height: "auto" }}
               onError={(e) => {
