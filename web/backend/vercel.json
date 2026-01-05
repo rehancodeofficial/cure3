@@ -1,13 +1,30 @@
 {
   "version": 2,
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/server.js"
     },
     {
-      "source": "/((?!api/).*)",
-      "destination": "/dist/$1"
+      "source": "/assets/(.*)",
+      "destination": "/dist/assets/$1"
+    },
+    {
+      "source": "/images/(.*)",
+      "destination": "/dist/images/$1"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/dist/favicon.ico"
+    },
+    {
+      "source": "/vite.svg",
+      "destination": "/dist/vite.svg"
+    },
+    {
+      "source": "/Asset3.png",
+      "destination": "/dist/Asset3.png"
     },
     {
       "source": "/((?!api/).*)",

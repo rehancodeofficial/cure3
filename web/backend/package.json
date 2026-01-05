@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force",
     "db:seed": "prisma db seed",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "build": "cd ../frontend && npm install && npm run build && cd ../backend && rm -rf dist && cp -r ../frontend/dist ./dist"
   },
   "keywords": [],
   "author": "",
