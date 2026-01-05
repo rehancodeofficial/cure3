@@ -113,7 +113,7 @@ app.get('/api/doctor/test', (_req, res) =>
 ----------------------------- */
 // In Vercel, we don't strictly need to serve static files from server.js if vercel.json handles it,
 // but keeping it as a fallback is fine.
-const distPath = path.join(__dirname, 'dist');
+const distPath = path.join(__dirname, 'public');
 app.use(express.static(distPath));
 
 app.get('*', (req, res) => {

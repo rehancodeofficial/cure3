@@ -7,28 +7,8 @@
       "destination": "/server.js"
     },
     {
-      "source": "/assets/(.*)",
-      "destination": "/dist/assets/$1"
-    },
-    {
-      "source": "/images/(.*)",
-      "destination": "/dist/images/$1"
-    },
-    {
-      "source": "/favicon.ico",
-      "destination": "/dist/favicon.ico"
-    },
-    {
-      "source": "/vite.svg",
-      "destination": "/dist/vite.svg"
-    },
-    {
-      "source": "/Asset3.png",
-      "destination": "/dist/Asset3.png"
-    },
-    {
       "source": "/((?!api/).*)",
-      "destination": "/dist/index.html"
+      "destination": "/index.html"
     }
   ],
   "headers": [
