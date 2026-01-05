@@ -15,11 +15,9 @@ app.use(
   cors({
     origin: [
       'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:5175',
-      'http://localhost:5176',
       'https://curevirtual.vercel.app',
       'https://cure-virtual-2.vercel.app',
+      'https://cure3-u4zb.vercel.app',
       process.env.CORS_ORIGIN,
     ].filter(Boolean),
     credentials: true,
