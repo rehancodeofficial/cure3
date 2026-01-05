@@ -1,14 +1,16 @@
-// FILE: backend/server.js
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
 const app = express();
 
-// ✅ Global Middlewares
+/* ----------------------------
+   ✅ GLOBAL MIDDLEWARES
+----------------------------- */
 app.use(
   cors({
     origin: [
@@ -18,152 +20,98 @@ app.use(
       'http://localhost:5176',
       'https://curevirtual.vercel.app',
       'https://cure-virtual-2.vercel.app',
-      process.env.CORS_ORIGIN || 'http://localhost:5173',
-    ],
+      process.env.CORS_ORIGIN,
+    ].filter(Boolean),
     credentials: true,
   })
 );
+
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 
-// ✅ Health Check
+/* ----------------------------
+   ✅ HEALTH CHECK
+----------------------------- */
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
-// ----------------------------
-// ✅ AUTH / TWILIO
-// ----------------------------
-const authRoutes = require('./routes/auth');
-// const twilioRoutes = require("./routes/twilio");
-const twilioTokenRoute = require('./routes/twilioToken');
-const otpRoutes = require('./routes/otp');
+/* ----------------------------
+   ✅ ROUTES
+----------------------------- */
 
-app.use('/api/auth', authRoutes);
-// app.use("/api/twilio", twilioRoutes);
-app.use('/api/token', twilioTokenRoute);
-app.use('/api/otp', otpRoutes);
+// AUTH / TWILIO
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/token', require('./routes/twilioToken'));
+app.use('/api/otp', require('./routes/otp'));
 
-// ----------------------------
-// ✅ SUPERADMIN ROUTES
-// ----------------------------
-const superadminRoutes = require('./routes/superadmin');
-const settingsRoutes = require('./routes/settings');
-const reportsRoutes = require('./routes/reports');
-const logsRoutes = require('./routes/logs');
-const activityLogsRoutes = require('./routes/activityLogs');
+// SUPERADMIN
+app.use('/api/superadmin', require('./routes/superadmin'));
+app.use('/api/superadmin/settings', require('./routes/settings'));
+app.use('/api/settings', require('./routes/settings'));
+app.use('/api/superadmin/reports', require('./routes/reports'));
+app.use('/api/superadmin/logs', require('./routes/logs'));
+app.use('/api/superadmin/activity-logs', require('./routes/activityLogs'));
 
-app.use('/api/superadmin', superadminRoutes);
-app.use('/api/superadmin/settings', settingsRoutes);
-app.use('/api/settings', settingsRoutes);
-app.use('/api/superadmin/reports', reportsRoutes);
-app.use('/api/superadmin/logs', logsRoutes);
-app.use('/api/superadmin/activity-logs', activityLogsRoutes);
+// ADMIN
+app.use('/api/admins', require('./routes/admins'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/admin/users', require('./routes/adminUsers'));
+app.use('/api/admin/messages', require('./routes/messages'));
+app.use('/api/admin', require('./routes/adminSubscription'));
 
-// ----------------------------
-// ✅ ADMIN ROUTES
-// ----------------------------
-const adminRoutes = require('./routes/admins'); // manage admins (superadmin)
-const adminUsersRoutes = require('./routes/adminUsers'); // manage users (patients/doctors)
-const adminDashboardRoutes = require('./routes/adminRoutes'); // admin dashboard
-//const adminAppointmentsRoutes = require("./routes/adminAppointments");
-const adminMessagesRoutes = require('./routes/messages'); // admin messaging
+// DOCTOR
+app.use('/api', require('./routes/doctorPatients'));
+app.use('/api/doctor', require('./routes/doctor'));
+app.use('/api/doctor/video', require('./routes/doctorVideo'));
+app.use('/api/videocall', require('./routes/videocall'));
 
-app.use('/api/admins', adminRoutes); // ONLY for superadmin use
-app.use('/api/admin', adminDashboardRoutes); // admin dashboard & user management
-app.use('/api/admin/users', adminUsersRoutes);
-//app.use("/api/admin/appointments", adminAppointmentsRoutes);
-app.use('/api/admin/messages', adminMessagesRoutes);
+// SCHEDULE
+app.use('/api/schedule', require('./routes/scheduleRoutes'));
 
-// ----------------------------
-// ✅ DOCTOR ROUTES
-// ----------------------------
-const doctorRoutes = require('./routes/doctor');
-const doctorVideoRoutes = require('./routes/doctorVideo');
-const doctorPatientsRoutes = require('./routes/doctorPatients');
-const videocallRoutes = require('./routes/videocall');
+// PATIENT
+app.use('/api', require('./routes/patientDoctors'));
+app.use('/api/patient', require('./routes/patientRoutes'));
 
-app.use('/api', doctorPatientsRoutes);
-app.use('/api/doctor', doctorRoutes);
-app.use('/api/doctor/video', doctorVideoRoutes);
-app.use('/api/videocall', videocallRoutes);
+// OTHER
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/chatbot', require('./routes/chatbot.routes'));
+app.use('/api/internal', require('./routes/internal'));
+app.use('/api/support', require('./routes/support'));
+app.use('/api/pharmacy', require('./routes/pharmacy'));
+app.use('/api/users', require('./routes/user'));
 
-// ----------------------------
-// ✅ SCHEDULE ROUTES
-// ----------------------------
-const scheduleRoutes = require('./routes/scheduleRoutes');
-app.use('/api/schedule', scheduleRoutes);
-
-// ----------------------------
-// ✅ PATIENT ROUTES
-// ----------------------------
-const patientRoutes = require('./routes/patientRoutes');
-const patientDoctorsRoutes = require('./routes/patientDoctors');
-
-// 👇 mount under /api
-app.use('/api', patientDoctorsRoutes);
-app.use('/api/patient', patientRoutes);
-
-const notificationsRoutes = require('./routes/notifications');
-app.use('/api/notifications', notificationsRoutes);
-
-const chatbotRoutes = require('./routes/chatbot.routes');
-const internalRoutes = require('./routes/internal');
-
-app.use('/api/chatbot', chatbotRoutes);
-app.use('/api/internal', internalRoutes);
-
-// ----------------------------
-// ✅ SUBSCRIPTION ROUTES
-// ----------------------------
+// SUBSCRIPTIONS
 const subscriptionRoutes = require('./routes/subscription');
-
-// Mount at /api for routes that already include "/subscription" prefix or for generic compatibility
 app.use('/api', subscriptionRoutes);
-
-// Mount at /api/subscribers for Admin lists & stats (routes defined as /stats, /list in the router)
 app.use('/api/subscribers', subscriptionRoutes);
 
-// PHARMACY ROUTES
-const pharmacyRoute = require('./routes/pharmacy');
-app.use('/api/pharmacy', pharmacyRoute);
-
-// FILE: SUBSCRIPTION
-const adminSubscriptionRoutes = require('./routes/adminSubscription');
-// ...
-app.use('/api/admin', adminSubscriptionRoutes);
-
-// SUPPORT ROUTES
-const supportRoutes = require('./routes/support');
-app.use('/api/support', supportRoutes);
-
-// Stripe webhook must use raw body
+// Stripe Webhook (RAW BODY)
 app.post(
   '/api/subscription/stripe/webhook',
   express.raw({ type: 'application/json' }),
   subscriptionRoutes.stripeWebhook
 );
-// ----------------------------
-// ✅ GLOBAL MESSAGES (optional)
-// ----------------------------
-const globalMessagesRoutes = require('./routes/messages');
-app.use('/api/messages', globalMessagesRoutes);
 
-// ----------------------------
-// ✅ USER PROFILE / LIST
-// ----------------------------
-const usersRoutes = require('./routes/user');
-app.use('/api/users', usersRoutes);
-
-// In App.js - add this before other routes for testing
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
-});
-
-app.get('/api/doctor/test', (req, res) => {
-  res.json({ message: 'Doctor routes are working!' });
-});
-
-// ✅ Server start
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
+// TEST ROUTES
+app.get('/api/test', (_req, res) =>
+  res.json({ message: 'API is working!' })
 );
+
+app.get('/api/doctor/test', (_req, res) =>
+  res.json({ message: 'Doctor routes are working!' })
+);
+
+/* ----------------------------
+   ✅ SERVE FRONTEND (Vercel)
+----------------------------- */
+const distPath = path.join(__dirname, 'dist');
+app.use(express.static(distPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
+
+/* ----------------------------
+   ❌ REMOVE app.listen()
+   ✅ EXPORT APP FOR VERCEL
+----------------------------- */
+module.exports = app;
