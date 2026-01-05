@@ -26,8 +26,16 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
+
+// Support raw body for Stripe webhook specifically
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/subscription/stripe/webhook') {
+    next();
+  } else {
+    express.json({ limit: '10kb' })(req, res, next);
+  }
+});
 
 /* ----------------------------
    ✅ HEALTH CHECK
@@ -103,11 +111,17 @@ app.get('/api/doctor/test', (_req, res) =>
 /* ----------------------------
    ✅ SERVE FRONTEND (Vercel)
 ----------------------------- */
+// In Vercel, we don't strictly need to serve static files from server.js if vercel.json handles it,
+// but keeping it as a fallback is fine.
 const distPath = path.join(__dirname, 'dist');
 app.use(express.static(distPath));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
+  if (!req.url.startsWith('/api/')) {
+    res.sendFile(path.join(distPath, 'index.html'));
+  } else {
+    res.status(404).json({ error: 'API route not found' });
+  }
 });
 
 /* ----------------------------
