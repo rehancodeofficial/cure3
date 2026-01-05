@@ -1,3 +1,4 @@
+.env
 web/backend.zip
 .venv/
 node_modules/
