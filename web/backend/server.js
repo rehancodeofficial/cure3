@@ -13,13 +13,26 @@ const app = express();
 ----------------------------- */
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'https://curevirtual.vercel.app',
-      'https://cure-virtual-2.vercel.app',
-      'https://cure3-u4zb.vercel.app',
-      process.env.CORS_ORIGIN,
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+      // 1. Array of explicitly allowed origins
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'https://curevirtual.vercel.app',
+        process.env.CORS_ORIGIN,
+      ].filter(Boolean);
+
+      // 2. Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+
+      // 3. Match explicit list or any Vercel deployment URL
+      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        console.warn(`🔒 CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
